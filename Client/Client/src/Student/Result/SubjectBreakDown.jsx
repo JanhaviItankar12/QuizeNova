@@ -6,7 +6,7 @@ import { BookOpen, TrendingUp } from "lucide-react";
 export default function SubjectBreakdown({ attempts }) {
   const subjectStats = {};
   
-  attempts.forEach(attempt => {
+  attempts?.submissions.forEach(attempt => {
     const subject = attempt.quiz?.subject || 'other';
     if (!subjectStats[subject]) {
       subjectStats[subject] = { 

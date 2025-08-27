@@ -5,32 +5,35 @@ import { Button } from "@/components/ui/button";
 import { Link, useParams } from "react-router-dom";
 import { BookOpen, TrendingUp, Clock, Award, Play, BarChart3 } from "lucide-react";
 import { useGetRecentPublishedQuizzesQuery } from "@/store/quizeApi";
-import { useGetRecentAttemptedQuizzesQuery } from "@/store/authApi";
+import { useGetCurrentUserQuery, useGetRecentAttemptedQuizzesQuery, useGetUserSubmissionsQuery } from "@/store/authApi";
 import RecentQuizzes from "./RecentQuizzes";
 import RecentAttempts from "./RecentAttempts";
 
 // Welcome Section Component
-// import WelcomeSection from "./WelcomeSection";
-
-
-
+ import WelcomeSection from "./WelcomeSection";
+// Stats Overview Component
+ import StatsOverview from "./StatsOverview";
 
 // Main Dashboard Component
 export default function StudentDashboard() {
-  const [user, setUser] = useState(null);
- 
-
+  
+  
   const params=useParams();
   const id=params.id;
 
-  
+ const {data:currentUser}=useGetCurrentUserQuery(id);
  const {data: quizzesData, isLoading, isError} = useGetRecentPublishedQuizzesQuery();
  const {data: attemptsData, isLoading:attemptsLoading, isError:attemptsError} = useGetRecentAttemptedQuizzesQuery();
- 
+  const { 
+     data: submissions, 
+     isLoading: submissionsLoading, 
+     error: submissionsError,
+     refetch: refetchSubmissions 
+   } = useGetUserSubmissionsQuery(
+     id);
+   
 
- 
-
-  if (isLoading) {
+ if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
@@ -42,9 +45,9 @@ export default function StudentDashboard() {
 
   return (
     <div className="p-6 mt-16 space-y-8 max-w-7xl mx-auto">
-      {/* <WelcomeSection user={user} attempts={attempts} /> */}
-{/*       
-      <StatsOverview attempts={attempts} quizzes={quizzes} /> */}
+      <WelcomeSection user={currentUser} attempts={submissions} />
+      
+      <StatsOverview attempts={submissions}  />
       
       <div className="grid lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2 space-y-8">

@@ -20,9 +20,13 @@ const userSchema=new mongoose.Schema({
         default: "user" 
     },
 
+    
     createdAt: { type: Date, default: Date.now }
 
     //add more details as per user
+    
+    
+
 
 },{timestamps:true});
 

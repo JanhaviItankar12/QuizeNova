@@ -4,14 +4,15 @@ import { Card, CardContent } from "@/components/ui/card";
 import { BarChart3, TrendingUp, Award, Clock } from "lucide-react";
 
 export default function ResultHeader({ attempts }) {
-  const totalQuizzes = attempts.length;
+  
+  const totalQuizzes = attempts?.submissions.length;
   const averageScore = totalQuizzes > 0 
-    ? Math.round(attempts.reduce((sum, a) => sum + a.percentage, 0) / totalQuizzes)
+    ? Math.round(attempts?.submissions.reduce((sum, a) => sum + a.percentage, 0) / totalQuizzes)
     : 0;
   const bestScore = totalQuizzes > 0 
-    ? Math.max(...attempts.map(a => a.percentage))
+    ? Math.max(...attempts?.submissions.map(a => a.percentage))
     : 0;
-  const totalTime = Math.round(attempts.reduce((sum, a) => sum + (a.time_taken || 0), 0));
+  const totalTime = Math.round(attempts?.submissions.reduce((sum, a) => sum + (a.time_taken || 0), 0));
 
   return (
     <div className="mb-8">

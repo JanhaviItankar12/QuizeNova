@@ -91,12 +91,14 @@ export default function RecentQuizzes({ quizzes , loading}) {
                 </div>
               </div>
               
-              <Link to="/">
-                <Button size="sm" className="ml-4 bg-blue-600 hover:bg-blue-700">
+              
+                <Button size="sm"
+                 onClick={() => navigate(`/student/${quiz._id}/take-quiz`, { state: { quizId: quiz._id } })}
+                 className="ml-4 bg-blue-600 hover:bg-blue-700">
                   <Play className="w-4 h-4 mr-1" />
                   Start
                 </Button>
-              </Link>
+             
             </div>
           </motion.div>
         ))}

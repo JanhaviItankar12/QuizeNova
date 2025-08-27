@@ -15,6 +15,7 @@ import Footer from './HomeSection/Footer'
 import StudentDashboard from './Student/StudentDashboard'
 import EditQuize from './Teacher/EditQuize'
 import TakeQuize from './Student/TakeQuize'
+import Result from './Student/Result'
 
 function App() {
   const [count, setCount] = useState(0)
@@ -43,6 +44,7 @@ function App() {
       <Route element={<ProtectedRoute allowedRoles={['student']} />}>
         <Route path="/student/:id/dashboard" element={<StudentDashboard/>} />
         <Route path="/student/:id/take-quiz" element={<TakeQuize/>} />
+        <Route path="/student/:id/view-results" element={<Result/>} />
       </Route>
 
       

@@ -6,17 +6,21 @@ import QuizeSession from "./QuizeSession";
 import QuizeComplete from "./QuizeComplete";
 import { useGetPublishedQuizzesQuery, useTakeQuizMutation } from "@/store/authApi";
 import { useGetQuizByIdQuery } from "@/store/quizeApi";
-import { useParams } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 
 export default function TakeQuize() {
-  const [selectedQuizId, setSelectedQuizId] = useState(null);
-  const [quizStarted, setQuizStarted] = useState(false);
+  const location=useLocation();
+  const initialQuizId = location.state?.quizId || null;
+  const params=useParams();
+  const id=params.id; 
+
+  const [selectedQuizId, setSelectedQuizId] = useState(initialQuizId);
+  const [quizStarted, setQuizStarted] = useState(!!initialQuizId);
   const [quizCompleted, setQuizCompleted] = useState(false);
   const [finalResults, setFinalResults] = useState(null);
   const [startTime, setStartTime] = useState(null);
+  
 
-  const params=useParams();
-  const id=params.id;
 
   // fetch all published quizzes
   const { data: publishedQuizeData, isLoading: publishedQuizeLoading, isError } =

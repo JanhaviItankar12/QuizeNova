@@ -4,11 +4,14 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Trophy, Clock, Target, CheckCircle, XCircle, Home, BarChart3, ChevronLeft, ChevronRight } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 
 
 export default function QuizeComplete({ results, onReturnToBrowser }) {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const params=useParams();
+  const id=params.id;
+
    
   const getScoreColor = (percentage) => {
     if (percentage >= 80) return "text-green-600";
@@ -24,10 +27,21 @@ export default function QuizeComplete({ results, onReturnToBrowser }) {
     return "Keep practicing! 💪";
   };
 
+  // Helper function to convert letter to index
+  const letterToIndex = (letter) => {
+    if (!letter) return -1;
+    const letters = ["A", "B", "C", "D"];
+    return letters.indexOf(letter);
+  };
+
   const currentQuestion = results.quiz.questions[currentQuestionIndex];
-  const userAnswer = results.answers[currentQuestionIndex];
-  const correctAnswer = currentQuestion.correct_answer;
-  const isCorrect = userAnswer === correctAnswer;
+  const userAnswerLetter = results.answers[currentQuestionIndex];
+  const correctAnswerLetter = currentQuestion.correct_answer;
+  
+  // Convert letters to indices for array access
+  const userAnswer = letterToIndex(userAnswerLetter);
+  const correctAnswer = letterToIndex(correctAnswerLetter);
+  const isCorrect = userAnswerLetter === correctAnswerLetter;
 
   const nextQuestion = () => {
     if (currentQuestionIndex < results.quiz.questions.length - 1) {
@@ -107,7 +121,7 @@ export default function QuizeComplete({ results, onReturnToBrowser }) {
                 
                 <div className="text-center">
                   <div className="text-4xl font-bold mb-2 text-slate-800">
-                    {results.answers.filter((ans, i) => ans === results.quiz.questions[i].correct_answer).length}
+                    {results.answers.filter((answerLetter, i) => answerLetter === results.quiz.questions[i].correct_answer).length}
                   </div>
                   <div className="text-slate-600">Correct</div>
                 </div>
@@ -151,21 +165,27 @@ export default function QuizeComplete({ results, onReturnToBrowser }) {
                 </Button>
                 
                 <div className="flex gap-2">
-                  {results.quiz.questions.map((_, index) => (
-                    <button
-                      key={index}
-                      onClick={() => setCurrentQuestionIndex(index)}
-                      className={`w-8 h-8 rounded-full text-sm font-medium transition-colors ${
-                        index === currentQuestionIndex
-                          ? 'bg-blue-600 text-white'
-                          : results.answers[index] === results.quiz.questions[index].correct_answer
-                          ? 'bg-green-100 text-green-700 hover:bg-green-200'
-                          : 'bg-red-100 text-red-700 hover:bg-red-200'
-                      }`}
-                    >
-                      {index + 1}
-                    </button>
-                  ))}
+                  {results.quiz.questions.map((question, index) => {
+                    const userAnswerLetter = results.answers[index];
+                    const correctAnswerLetter = question.correct_answer;
+                    const isQuestionCorrect = userAnswerLetter === correctAnswerLetter;
+                    
+                    return (
+                      <button
+                        key={index}
+                        onClick={() => setCurrentQuestionIndex(index)}
+                        className={`w-8 h-8 rounded-full text-sm font-medium transition-colors ${
+                          index === currentQuestionIndex
+                            ? 'bg-blue-600 text-white'
+                            : isQuestionCorrect
+                            ? 'bg-green-100 text-green-700 hover:bg-green-200'
+                            : 'bg-red-100 text-red-700 hover:bg-red-200'
+                        }`}
+                      >
+                        {index + 1}
+                      </button>
+                    );
+                  })}
                 </div>
                 
                 <Button
@@ -218,7 +238,7 @@ export default function QuizeComplete({ results, onReturnToBrowser }) {
                               <div className="flex gap-2">
                                 {optionIndex === correctAnswer && (
                                   <Badge variant="outline" className="text-green-700 border-green-500">
-                                    Correct Answer: {correctAnswer}
+                                    Correct Answer
                                   </Badge>
                                 )}
                                 {optionIndex === userAnswer && userAnswer !== correctAnswer && (
@@ -233,13 +253,18 @@ export default function QuizeComplete({ results, onReturnToBrowser }) {
                       })}
                     </div>
 
-                    {/* Answer Summary */}
+                    {/* Answer Summary - Debug Version */}
                     <div className="mt-4 p-3 rounded-lg bg-white border border-slate-300">
+                     
+                      
                       <div className="flex items-center justify-between text-sm">
                         <div className="flex items-center gap-2">
                           <span className="font-medium text-slate-700">Your Answer:</span>
                           <span className={`font-medium ${isCorrect ? 'text-green-600' : 'text-red-600'}`}>
-                            {currentQuestion.options[userAnswer]}
+                            {userAnswer !== undefined && currentQuestion.options[userAnswer] ? 
+                              currentQuestion.options[userAnswer] : 
+                              `Not answered (index: ${userAnswer})`
+                            }
                           </span>
                         </div>
                         <div className={`font-medium ${isCorrect ? 'text-green-600' : 'text-red-600'}`}>
@@ -251,7 +276,10 @@ export default function QuizeComplete({ results, onReturnToBrowser }) {
                         <div className="flex items-center gap-2 mt-2 text-sm">
                           <span className="font-medium text-slate-700">Correct Answer:</span>
                           <span className="font-medium text-green-600">
-                            {currentQuestion.options[correctAnswer]}
+                            {correctAnswer !== undefined && currentQuestion.options[correctAnswer] ? 
+                              currentQuestion.options[correctAnswer] : 
+                              `Index: ${correctAnswer}`
+                            }
                           </span>
                         </div>
                       )}
@@ -277,7 +305,7 @@ export default function QuizeComplete({ results, onReturnToBrowser }) {
             Take Another Quiz
           </Button>
           
-          <Link to="/">
+          <Link to={`/student/${id}/view-results`}>
             <Button variant="outline" className="px-8">
               <BarChart3 className="w-4 h-4 mr-2" />
               View All Results

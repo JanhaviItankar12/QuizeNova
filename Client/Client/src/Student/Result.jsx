@@ -1,71 +1,86 @@
-import React, { useState, useEffect } from "react";
-import { QuizAttempt, Quiz, User } from "@/entities/all";
+import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
 import { TrendingUp, Clock, Target, Award } from "lucide-react";
 import { motion } from "framer-motion";
 
-import ResultsHeader from "../components/results/ResultsHeader";
-import ResultsChart from "../components/results/ResultsChart";
-import AttemptsList from "../components/results/AttemptsList";
-import SubjectBreakdown from "../components/results/SubjectBreakdown";
+
+import ResultsHeader from "./Result/ResultHeader";
+import ResultChart from "./Result/ResultChart";
+import AttemptList from "./Result/AttemptList";
+import SubjectBreakdown from "./Result/SubjectBreakdown";
+import { useGetCurrentUserQuery, useGetUserSubmissionsQuery } from "@/store/authApi";
 
 export default function Result() {
-  const [attempts, setAttempts] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [user, setUser] = useState(null);
+  // RTK Query hooks
+  const { 
+    data: user, 
+    isLoading: userLoading, 
+    error: userError 
+  } = useGetCurrentUserQuery();
 
-  useEffect(() => {
-    loadResults();
-  }, []);
+const id=user?.user._id;
+  const { 
+    data: submissions, 
+    isLoading: submissionsLoading, 
+    error: submissionsError,
+    refetch: refetchSubmissions 
+  } = useGetUserSubmissionsQuery(
+   id
+  );
+  
+  
+  // Combined loading state
+  const loading = userLoading || submissionsLoading;
 
-  const loadResults = async () => {
-    try {
-      const currentUser = await User.me();
-      setUser(currentUser);
-      
-      const userAttempts = await QuizAttempt.filter(
-        { student_email: currentUser.email }, 
-        "-created_date"
-      );
-      
-      // Get quiz details for each attempt
-      const attemptsWithQuizDetails = await Promise.all(
-        userAttempts.map(async (attempt) => {
-          try {
-            const quiz = await Quiz.get(attempt.quiz_id);
-            return { ...attempt, quiz };
-          } catch {
-            return attempt;
-          }
-        })
-      );
-      
-      setAttempts(attemptsWithQuizDetails);
-    } catch (error) {
-      console.error("Error loading results:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  if (loading) {
+  // Error handling
+  if (userError || submissionsError) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        <Card className="w-96">
+          <CardContent className="p-6 text-center">
+            <div className="text-red-600 mb-4">⚠️ Error Loading Results</div>
+            <p className="text-sm text-slate-600 mb-4">
+              {userError?.data?.message || submissionsError?.data?.message || "Something went wrong"}
+            </p>
+            <button 
+              onClick={() => {
+                if (submissionsError) refetchSubmissions();
+              }}
+              className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+            >
+              Try Again
+            </button>
+          </CardContent>
+        </Card>
       </div>
     );
   }
 
+  // Loading state
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-slate-600">Loading your results...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Transform data to match your existing component structure
+  const attempts = submissions || [];
+
   return (
-    <div className="p-6 space-y-8 max-w-7xl mx-auto">
-      <ResultsHeader attempts={attempts} />
+    <div className="p-6 mt-16 space-y-8 max-w-7xl mx-auto">
+      <ResultsHeader attempts={attempts} user={user} />
       
       <div className="grid lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2 space-y-8">
-          <ResultsChart attempts={attempts} />
-          <AttemptsList attempts={attempts} />
+          <ResultChart attempts={attempts} />
+          <AttemptList attempts={attempts} />
         </div>
         
         <div className="space-y-6">

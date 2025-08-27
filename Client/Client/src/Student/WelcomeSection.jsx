@@ -3,14 +3,9 @@ import { motion } from "framer-motion";
 import { User, Sparkles } from "lucide-react";
 
 export default function WelcomeSection({ user, attempts }) {
-  const getGreeting = () => {
-    const hour = new Date().getHours();
-    if (hour < 12) return "Good morning";
-    if (hour < 18) return "Good afternoon";
-    return "Good evening";
-  };
+  
 
-  console.log(user);
+  console.log(attempts);
 
   const getMotivationalMessage = () => {
     const messages = [
@@ -40,7 +35,7 @@ export default function WelcomeSection({ user, attempts }) {
             </div>
             <div>
               <h1 className="text-3xl font-bold">
-                {getGreeting()}, {user?.full_name || 'Student'}!
+                Welcome Back {user?.user.name || 'Student'}!
               </h1>
               <p className="text-blue-100 flex items-center gap-2 mt-1">
                 <Sparkles className="w-4 h-4" />
@@ -51,14 +46,14 @@ export default function WelcomeSection({ user, attempts }) {
           
           <div className="flex items-center gap-6 mt-6">
             <div className="text-center">
-              <div className="text-2xl font-bold">{attempts.length}</div>
+              <div className="text-2xl font-bold">{attempts?.submissions.length}</div>
               <div className="text-blue-200 text-sm">Quizzes Taken</div>
             </div>
             <div className="w-px h-12 bg-blue-300/30"></div>
             <div className="text-center">
               <div className="text-2xl font-bold">
-                {attempts.length > 0 
-                  ? Math.round(attempts.reduce((sum, a) => sum + a.percentage, 0) / attempts.length)
+                {attempts?.submissions.length > 0 
+                  ? Math.round(attempts?.submissions.reduce((sum, a) => sum + a.percentage, 0) / attempts?.submissions.length)
                   : 0}%
               </div>
               <div className="text-blue-200 text-sm">Average Score</div>

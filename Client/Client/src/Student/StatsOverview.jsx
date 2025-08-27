@@ -3,19 +3,19 @@ import { motion } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/card";
 import { TrendingUp, Clock, Target, Award } from "lucide-react";
 
-export default function StatsOverview({ attempts, quizzes }) {
-  const totalTime = attempts.reduce((sum, a) => sum + (a.time_taken || 0), 0);
-  const averageScore = attempts.length > 0 
-    ? Math.round(attempts.reduce((sum, a) => sum + a.percentage, 0) / attempts.length)
+export default function StatsOverview({ attempts }) {
+  const totalTime = attempts?.submissions.reduce((sum, a) => sum + (a.time_taken || 0), 0);
+  const averageScore = attempts?.submissions.length > 0 
+    ? Math.round(attempts?.submissions.reduce((sum, a) => sum + a.percentage, 0) / attempts?.submissions.length)
     : 0;
-  const bestScore = attempts.length > 0 
-    ? Math.max(...attempts.map(a => a.percentage))
+  const bestScore = attempts?.submissions.length > 0 
+    ? Math.max(...attempts?.submissions.map(a => a.percentage))
     : 0;
 
   const stats = [
     {
       title: "Total Quizzes",
-      value: attempts.length,
+      value: attempts?.submissions.length,
       icon: Target,
       color: "from-blue-500 to-blue-600",
       bgColor: "bg-blue-50",

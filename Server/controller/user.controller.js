@@ -190,3 +190,34 @@ export const takeQuiz = async (req, res) => {
   }
 };
 
+//get users submissions 
+export const getUserSubmissions = async (req, res) => {
+    try {
+        const userId = req.user.id;
+
+        const submissions = await Submission.find({ student: userId })
+            .sort({ submittedAt: -1 })
+            .populate("quiz");
+
+        // normalize submissions
+        const formattedSubmissions = submissions.map(s => {
+            const totalQuestions = s.answers.length;
+            const percentage = totalQuestions > 0 ? (s.score / totalQuestions) * 100 : 0;
+
+            return {
+                id: s._id,
+                quiz: s.quiz ? { title: s.quiz.title } : null,
+                score: s.score,
+                max_score: totalQuestions,
+                percentage,
+                created_date: s.submittedAt,
+                time_taken: s.timeTaken || null // add if you store timeTaken later
+            };
+        });
+
+        return res.status(200).json({ submissions: formattedSubmissions });
+    } catch (error) {
+        return res.status(500).json({ message: "Failed to fetch submissions", error: error.message });
+    }
+}
+

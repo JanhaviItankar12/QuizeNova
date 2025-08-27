@@ -5,7 +5,7 @@ import { TrendingUp } from "lucide-react";
 import { format } from "date-fns";
 
 export default function ResultChart({ attempts }) {
-  const chartData = attempts
+  const chartData = attempts?.submissions
     .slice(-10) // Last 10 attempts
     .reverse()
     .map((attempt, index) => ({

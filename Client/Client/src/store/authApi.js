@@ -62,6 +62,14 @@ export const authApi = createApi({
                 method: 'GET',
             }),
         }),
+
+        //get user submissions
+        getUserSubmissions: builder.query({
+            query: (id) => ({
+                url: `/student/${id}/submissions`,
+                method: 'GET',
+            }),
+        }),
     })
 })
 
@@ -72,5 +80,6 @@ export const {
     useGetCurrentUserQuery,
     useGetRecentAttemptedQuizzesQuery,
     useTakeQuizMutation,
-    useGetPublishedQuizzesQuery
+    useGetPublishedQuizzesQuery,
+    useGetUserSubmissionsQuery
 } = authApi
