@@ -30,6 +30,7 @@ const difficultyColors = {
 export default function RecentQuizzes({ quizzes , loading}) {
 
     const navigate=useNavigate();
+    const id=localStorage.getItem("id");
 
   if (loading) {
     return (
@@ -50,7 +51,7 @@ export default function RecentQuizzes({ quizzes , loading}) {
       <CardHeader className="pb-4">
         <div className="flex items-center justify-between">
           <CardTitle className="text-xl font-bold text-slate-800">Available Quizzes</CardTitle>
-          <Link to="/">
+          <Link to={`/student/${id}/take-quiz`}>
             <Button variant="outline" size="sm">View All</Button>
           </Link>
         </div>
@@ -74,7 +75,7 @@ export default function RecentQuizzes({ quizzes , loading}) {
                 <div className="flex items-center gap-2 flex-wrap">
                   <Badge className={`${subjectColors[quiz.subject]} border`}>
                     <BookOpen className="w-3 h-3 mr-1" />
-                    {quiz.subject.replace('_', ' ')}
+                    {quiz.subject?.name.replace('_', ' ')}
                   </Badge>
                   <Badge variant="outline" className={difficultyColors[quiz.difficulty]}>
                     {quiz.difficulty}

@@ -23,6 +23,7 @@ export default function StudentDashboard() {
 
  const {data:currentUser}=useGetCurrentUserQuery(id);
  const {data: quizzesData, isLoading, isError} = useGetRecentPublishedQuizzesQuery();
+ console.log(quizzesData);
  const {data: attemptsData, isLoading:attemptsLoading, isError:attemptsError} = useGetRecentAttemptedQuizzesQuery();
   const { 
      data: submissions, 

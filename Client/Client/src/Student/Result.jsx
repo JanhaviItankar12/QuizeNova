@@ -4,33 +4,40 @@ import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
 import { TrendingUp, Clock, Target, Award } from "lucide-react";
 import { motion } from "framer-motion";
-
-
 import ResultsHeader from "./Result/ResultHeader";
 import ResultChart from "./Result/ResultChart";
 import AttemptList from "./Result/AttemptList";
 import SubjectBreakdown from "./Result/SubjectBreakdown";
 import { useGetCurrentUserQuery, useGetUserSubmissionsQuery } from "@/store/authApi";
+import { useEffect } from "react";
 
 export default function Result() {
-  // RTK Query hooks
+  // Fetch current user
   const { 
     data: user, 
     isLoading: userLoading, 
     error: userError 
   } = useGetCurrentUserQuery();
 
-const id=user?.user._id;
+  const id = user?.user?._id;
+
+  // Setup submissions query with skip (initially skipped)
   const { 
     data: submissions, 
     isLoading: submissionsLoading, 
     error: submissionsError,
     refetch: refetchSubmissions 
-  } = useGetUserSubmissionsQuery(
-   id
-  );
-  
-  
+  } = useGetUserSubmissionsQuery(id, {
+    skip: !id,
+  });
+
+  // 🔑 Once id is available, refetch submissions
+  useEffect(() => {
+    if (id) {
+      refetchSubmissions();
+    }
+  }, [id, refetchSubmissions]);
+
   // Combined loading state
   const loading = userLoading || submissionsLoading;
 
@@ -45,9 +52,7 @@ const id=user?.user._id;
               {userError?.data?.message || submissionsError?.data?.message || "Something went wrong"}
             </p>
             <button 
-              onClick={() => {
-                if (submissionsError) refetchSubmissions();
-              }}
+              onClick={() => refetchSubmissions()}
               className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
             >
               Try Again
@@ -59,7 +64,7 @@ const id=user?.user._id;
   }
 
   // Loading state
-  if (loading) {
+  if (loading || !id) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
@@ -70,7 +75,6 @@ const id=user?.user._id;
     );
   }
 
-  // Transform data to match your existing component structure
   const attempts = submissions || [];
 
   return (

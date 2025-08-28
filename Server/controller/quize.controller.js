@@ -1,39 +1,59 @@
 import Quiz from "../models/quize.model.js";
+import Subject from "../models/subject.model.js";
 
 // Create Quiz
 export const createQuiz = async (req, res) => {
-  try {
-    const { title, description, subject, difficulty, time_limit, questions, is_published } = req.body;
+    try {
+        const { title, description, subject, difficulty, time_limit, questions, is_published } = req.body;
 
-    if (!title || !questions || questions.length === 0) {
-      return res.status(400).json({ message: "Title and questions are required" });
+        if (!title || !questions || questions.length === 0) {
+            return res.status(400).json({ message: "Title and questions are required" });
+        }
+
+        // Find subject by name
+        let subjectDoc = await Subject.findOne({ name: subject });
+        if (!subjectDoc) {
+            subjectDoc = await Subject.findOne({ name: "Other" });
+        }
+
+        // Create quiz
+        const quiz = new Quiz({
+            title,
+            description,
+            subject: subjectDoc ? subjectDoc._id : null,   // ✅ ObjectId
+            difficulty,
+            time_limit,
+            questions,
+            is_published,
+            total_questions: questions.length,
+            teacher: req.user.id,
+        });
+
+        // Link quiz to subject
+        if (subjectDoc && !subjectDoc.quizzes.includes(quiz._id)) {
+            subjectDoc.quizzes.push(quiz._id);
+            await subjectDoc.save();
+        }
+
+        const savedQuiz = await quiz.save();
+        await savedQuiz.populate("subject", "name"); // only populate name field
+
+        res.status(201).json({
+            message: "Quiz created successfully",
+            quiz: savedQuiz
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "Server error" });
     }
-
-    const quiz = new Quiz({
-      title,
-      description,
-      subject,
-      difficulty,
-      time_limit,
-      questions,
-      is_published,
-      total_questions: questions.length,
-      teacher: req.user.id  // comes from JWT middleware
-    });
-
-    await quiz.save();
-    res.status(201).json({ message: "Quiz created successfully", quiz });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Server error" });
-  }
 };
+
 
 
 // Get Quizzes for a Teacher
 export const getQuizzesByTeacher = async (req, res) => {
     try {
-        const quizzes = await Quiz.find({ teacher: req.user.id }).sort({ createdAt: -1 });
+        const quizzes = await Quiz.find({ teacher: req.user.id }).sort({ createdAt: -1 }).populate('subject', 'name icon');
         res.status(200).json(quizzes);
     } catch (error) {
         console.error(error);
@@ -48,7 +68,7 @@ export const getQuizById = async (req, res) => {
         if (!quiz) {
             return res.status(404).json({ message: "Quiz not found" });
         }
-       
+
         res.status(200).json(quiz);
     } catch (error) {
         console.error(error);
@@ -61,7 +81,7 @@ export const getQuizById = async (req, res) => {
 export const updateQuiz = async (req, res) => {
     try {
         const quiz = await Quiz.findById(req.params.id);
-        
+
         if (!quiz) {
             return res.status(404).json({ message: "Quiz not found" });
         }
@@ -103,7 +123,7 @@ export const deleteQuiz = async (req, res) => {
         if (quiz.teacher.toString() !== req.user.id) {
             return res.status(403).json({ message: "Access denied" });
         }
-        
+
         //remove is not working
         await quiz.deleteOne();
         res.status(200).json({ message: "Quiz deleted successfully" });
@@ -167,11 +187,12 @@ export const getQuizAnalytics = async (req, res) => {
 // get all published quizzes
 export const getPublishedQuizzes = async (req, res) => {
     try {
-        const quizzes = await Quiz.find({ is_published: true }).sort({ createdAt: -1 });
-        res.status(200).json(quizzes);
+        const quizzes = await Quiz.find({ is_published: true }).sort({ createdAt: -1 }).populate('subject', 'name icon');
+
+        return res.status(200).json(quizzes);
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: "Server error" });
+        return res.status(500).json({ message: "Server error" });
     }
 }
 
@@ -180,7 +201,7 @@ export const getPublishedQuizzes = async (req, res) => {
 //get recent published quizzes
 export const getRecentPublishedQuizzes = async (req, res) => {
     try {
-        const quizzes = await Quiz.find({ is_published: true }).sort({ createdAt: -1 }).limit(5);
+        const quizzes = await Quiz.find({ is_published: true }).sort({ createdAt: -1 }).limit(5).populate('subject', 'name icon');
         res.status(200).json(quizzes);
     } catch (error) {
         console.error(error);

@@ -2,8 +2,25 @@ import React from "react";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Play, Users, Trophy, Zap } from "lucide-react";
 import { motion } from "framer-motion";
+import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 
 export default function Hero() {
+  const { user, isAuthenticated } = useSelector(store => store.auth);
+  const navigate = useNavigate();
+
+  
+
+    const handleClick = () => {
+    if (isAuthenticated && user?.role === "student") {
+      navigate(`/student/${user.id}/take-quiz`);
+    } else if(isAuthenticated && user?.role==="teacher"){
+      navigate("/teacher/createQuize");
+    }
+    else{
+      navigate("/login");
+    }
+  }
   return (
     <section className="relative min-h-screen bg-gradient-to-br from-indigo-900 via-indigo-800 to-purple-900 overflow-hidden">
       {/* Animated background elements */}
@@ -36,7 +53,9 @@ export default function Hero() {
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+           
               <Button 
+              onClick={handleClick}
                 size="lg" 
                 className="bg-white text-indigo-900 hover:bg-indigo-50 font-semibold px-8 py-6 text-lg group"
               >
@@ -44,14 +63,7 @@ export default function Hero() {
                 <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </Button>
               
-              <Button 
-                variant="outline" 
-                size="lg"
-                className="border-white/20 text-white hover:bg-white/10 backdrop-blur-sm px-8 py-6 text-lg"
-              >
-                <Play className="mr-2 w-5 h-5" />
-                Watch Demo
-              </Button>
+              
             </div>
 
             {/* Stats */}

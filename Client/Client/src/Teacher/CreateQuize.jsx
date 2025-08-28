@@ -13,14 +13,18 @@ import { toast } from "sonner";
 
 // Constants
 const SUBJECTS = [
-  { value: "math", label: "Mathematics" },
-  { value: "science", label: "Science" },
-  { value: "english", label: "English" },
-  { value: "history", label: "History" },
-  { value: "geography", label: "Geography" },
-  { value: "art", label: "Art" },
-  { value: "music", label: "Music" },
-  { value: "other", label: "Other" }
+  { value: "Technology", label: "Technology" },
+  { value: "Science", label: "Science" },
+  { value: "History", label: "History" },
+  { value: "Geography", label: "Geography" },
+  { value: "Sports", label: "Sports" },
+  { value: "Entertainment", label: "Entertainment" },
+  { value: "Business", label: "Business" },
+  { value: "Health", label: "Health" },
+  { value: "Art", label: "Art" },
+  { value: "Literature", label: "Literature" },
+  { value: "Other", label: "Other" }
+  
 ];
 
 const DIFFICULTIES = [
@@ -189,6 +193,7 @@ export default function CreateQuiz() {
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="subject">Subject</Label>
+                  
                   <Select value={quiz.subject} onValueChange={(value) => setQuiz(prev => ({ ...prev, subject: value }))}>
                     <SelectTrigger className="bg-white/50">
                       <SelectValue />

@@ -18,7 +18,7 @@ export default function MyQuizzes() {
     const [filterStatus, setFilterStatus] = useState("all");
 
     const { data: quizeData,isLoading,error,refetch } = useGetQuizzesByTeacherQuery();
-    
+    console.log("Fetched quizzes data:", quizeData);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -61,16 +61,19 @@ export default function MyQuizzes() {
 
         setFilteredQuizzes(filtered);
     };
-
+    
     const subjectColors = {
-        math: "bg-blue-100 text-blue-800",
-        science: "bg-green-100 text-green-800",
-        english: "bg-purple-100 text-purple-800",
-        history: "bg-amber-100 text-amber-800",
-        geography: "bg-cyan-100 text-cyan-800",
-        art: "bg-pink-100 text-pink-800",
-        music: "bg-indigo-100 text-indigo-800",
-        other: "bg-gray-100 text-gray-800"
+        Technology: "bg-blue-100 text-blue-800",
+        Science: "bg-green-100 text-green-800",
+        History: "bg-amber-100 text-amber-800",
+        Geography: "bg-cyan-100 text-cyan-800",
+        Sports: "bg-red-100 text-red-800",
+        Entertainment: "bg-purple-100 text-purple-800",
+        Business: "bg-teal-100 text-teal-800",
+        Health: "bg-pink-100 text-pink-800",
+        Art: "bg-rose-100 text-rose-800",
+        Literature: "bg-indigo-100 text-indigo-800",
+        Other: "bg-gray-100 text-gray-800"
     };
 
     const handleCreateQuiz = () => {
@@ -121,14 +124,17 @@ export default function MyQuizzes() {
                             </SelectTrigger>
                             <SelectContent>
                                 <SelectItem value="all">All Subjects</SelectItem>
-                                <SelectItem value="math">Mathematics</SelectItem>
-                                <SelectItem value="science">Science</SelectItem>
-                                <SelectItem value="english">English</SelectItem>
-                                <SelectItem value="history">History</SelectItem>
-                                <SelectItem value="geography">Geography</SelectItem>
-                                <SelectItem value="art">Art</SelectItem>
-                                <SelectItem value="music">Music</SelectItem>
-                                <SelectItem value="other">Other</SelectItem>
+                                <SelectItem value="Technology">Technology</SelectItem>
+                                <SelectItem value="Science">Science</SelectItem>
+                                <SelectItem value="History">History</SelectItem>
+                                <SelectItem value="Geography">Geography</SelectItem>
+                                <SelectItem value="Sports">Sports</SelectItem>
+                                <SelectItem value="Entertainment">Entertainment</SelectItem>
+                                <SelectItem value="Business">Business</SelectItem>
+                                <SelectItem value="Health">Health</SelectItem>
+                                <SelectItem value="Art">Art</SelectItem>
+                                <SelectItem value="Literature">Literature</SelectItem>
+                                <SelectItem value="Other">Other</SelectItem>
                             </SelectContent>
                         </Select>
                         <Select value={filterStatus} onValueChange={setFilterStatus}>
@@ -173,8 +179,8 @@ export default function MyQuizzes() {
                                     <CardHeader>
                                         <div className="flex items-start justify-between mb-2">
                                             <div className="flex items-center gap-2">
-                                                <Badge className={subjectColors[quiz.subject] || subjectColors.other}>
-                                                    {quiz.subject?.replace('_', ' ') || 'Other'}
+                                                <Badge className={subjectColors[quiz?.subject?.name] || subjectColors.other}>
+                                                    {quiz.subject?.name.replace('_', ' ') || 'Other'}
                                                 </Badge>
                                                 <Badge variant={quiz.is_published ? "default" : "secondary"}>
                                                     {quiz.is_published ? 'Published' : 'Draft'}

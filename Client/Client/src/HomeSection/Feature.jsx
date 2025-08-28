@@ -12,6 +12,7 @@ import {
   Zap
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 const features = [
   {
@@ -60,6 +61,19 @@ const features = [
 
 export default function Feature() {
     const navigate=useNavigate();
+    const { user, isAuthenticated } = useSelector(store => store.auth);
+
+    const handleClick = () => {
+    if (isAuthenticated && user?.role === "student") {
+      navigate(`/student/${user.id}/take-quiz`);
+    } else if(isAuthenticated && user?.role==="teacher"){
+      navigate("/teacher/createQuize");
+    }
+    else{
+      navigate("/login");
+    }
+  }
+
   return (
     <section className="py-24 bg-gradient-to-b from-gray-50 to-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -135,7 +149,9 @@ export default function Feature() {
             <p className="text-xl text-indigo-100 mb-8 max-w-2xl mx-auto">
               Join thousands of educators and businesses creating engaging quizzes with our platform.
             </p>
-            <button className="bg-white text-indigo-600 px-8 py-4 rounded-xl font-semibold text-lg hover:bg-indigo-50 transition-colors inline-flex items-center" onClick={()=>navigate("/login")}>
+            <button
+             onClick={handleClick}
+             className="bg-white text-indigo-600 px-8 py-4 rounded-xl font-semibold text-lg hover:bg-indigo-50 transition-colors inline-flex items-center">
               Start Building Now
               <Zap className="ml-2 w-5 h-5" />
             </button>

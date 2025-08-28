@@ -2,6 +2,7 @@ import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
 import connectDB from "./config/db.js";
+import {seedSubjects} from  "./models/subject.model.js";
 
 //routes-user
 import userRoute from "./routes/user.route.js";
@@ -9,8 +10,10 @@ import quizeRoute from "./routes/quize.route.js";
 
 dotenv.config();
 
-//call database
-connectDB();
+//connect DB first
+connectDB().then(() => {
+  seedSubjects(); // <-- seed after DB connection
+});
 
 const app = express();
 app.use(cors({

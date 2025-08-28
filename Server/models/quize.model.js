@@ -18,9 +18,11 @@ const quizSchema = new mongoose.Schema({
   title: { type: String, required: true },
   description: { type: String },
   subject: { 
-    type: String, 
-    enum: ["math", "science", "english", "history", "geography", "art", "music", "other"], 
-    default: "other" 
+    //take from subject model
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Subject",
+    required: true
+
   },
   difficulty: { 
     type: String, 

@@ -16,6 +16,9 @@ import StudentDashboard from './Student/StudentDashboard'
 import EditQuize from './Teacher/EditQuize'
 import TakeQuize from './Student/TakeQuize'
 import Result from './Student/Result'
+import AllCategoryPage from './HomeSection/AllCategoryPage'
+import QuizeListPage from './HomeSection/QuizeListPage'
+
 
 function App() {
   const [count, setCount] = useState(0)
@@ -28,6 +31,9 @@ function App() {
       <Route path="/" element={<LandingPage />} />
       <Route path="/login" element={<AuthForm />} />
       <Route path="/signup" element={<AuthForm />} />
+      <Route path="/allCategories" element={<AllCategoryPage />} />
+      
+      <Route path="/quizzes/" element={<QuizeListPage />} />
 
 
       {/* protected routes -teacher*/}

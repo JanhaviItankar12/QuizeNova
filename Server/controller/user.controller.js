@@ -3,6 +3,7 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import Submission from "../models/submission.model.js";
 import Quiz from "../models/quize.model.js";
+import Subject from "../models/subject.model.js";
 
 export const signup = async (req, res) => {
     try {
@@ -220,4 +221,97 @@ export const getUserSubmissions = async (req, res) => {
         return res.status(500).json({ message: "Failed to fetch submissions", error: error.message });
     }
 }
+
+
+//get quize by category
+
+export const getQuizzesByCategory = async (req, res) => {
+    try {
+        const { category } = req.query;
+       
+        if (!category) {
+            return res.status(400).json({ message: "Category is required" });
+        }
+
+        // First find the subject by name
+        const subject = await Subject.findOne({ name: category });
+        
+        if (!subject) {
+            return res.status(404).json({ message: "Category not found" });
+        }
+
+        // Then find quizzes by subject ID
+        const quizzes = await Quiz.find({ 
+            subject: subject._id, 
+            published: true 
+        })
+        .populate('subject', 'name') // Populate subject name
+        .select('title description subject difficulty time_limit questions createdAt')
+        .limit(10);
+
+        return res.status(200).json({ quizzes });
+    } catch (error) {
+        return res.status(500).json({ message: "Failed to fetch quizzes", error: error.message });
+    }
+}
+
+//get all subjects with quiz count
+export const getSubjectsWithQuizCount = async (req, res) => {
+  try {
+    let subjects = await Subject.aggregate([
+      {
+        $lookup: {
+          from: "quizzes",
+          localField: "quizzes",
+          foreignField: "_id",
+          as: "quizzes"
+        }
+      },
+      {
+        $addFields: {
+          quizCount: { $size: "$quizzes" }
+        }
+      },
+      {
+        $project: {
+          name: 1,
+          description: 1,
+          icon: 1,
+          quizCount: 1,
+          quizzes: 1
+        }
+      }
+    ]);
+
+    // Merge all "Other" subjects into one
+    const mergedSubjects = [];
+    let otherSubject = null;
+
+    subjects.forEach((subj) => {
+      if (subj.name.toLowerCase() === "other") {
+        if (!otherSubject) {
+          otherSubject = { ...subj }; // initialize
+        } else {
+          // merge quizzes and count
+          otherSubject.quizzes.push(...subj.quizzes);
+          otherSubject.quizCount = otherSubject.quizzes.length;
+        }
+      } else {
+        mergedSubjects.push(subj);
+      }
+    });
+
+    if (otherSubject) mergedSubjects.push(otherSubject);
+
+    // Return mergedSubjects instead of subjects
+    return res.json({ categories: mergedSubjects });
+
+  } catch (err) {
+    return res.status(500).json({ message: err.message });
+  }
+};
+
+
+
+
 

@@ -5,7 +5,6 @@ import { User, Sparkles } from "lucide-react";
 export default function WelcomeSection({ user, attempts }) {
   
 
-  console.log(attempts);
 
   const getMotivationalMessage = () => {
     const messages = [

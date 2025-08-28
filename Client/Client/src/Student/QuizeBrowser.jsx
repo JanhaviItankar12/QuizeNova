@@ -76,7 +76,7 @@ export default function QuizeBrowser({ quizzes, onQuizSelect }) {
                 <SelectItem value="all">All Subjects</SelectItem>
                 {subjects.map(subject => (
                   <SelectItem key={subject} value={subject}>
-                    {subject.replace('_', ' ')}
+                    {subject?.name.replace('_', ' ')}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -111,7 +111,7 @@ export default function QuizeBrowser({ quizzes, onQuizSelect }) {
                 <div className="flex items-start justify-between mb-3">
                   <Badge className={`${subjectColors[quiz.subject]} border`}>
                     <BookOpen className="w-3 h-3 mr-1" />
-                    {quiz.subject.replace('_', ' ')}
+                    {quiz.subject?.name.replace('_', ' ')}
                   </Badge>
                   <Badge variant="outline" className={difficultyColors[quiz.difficulty]}>
                     {quiz.difficulty}

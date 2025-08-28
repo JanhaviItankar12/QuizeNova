@@ -70,6 +70,21 @@ export const authApi = createApi({
                 method: 'GET',
             }),
         }),
+         
+        getSujectsWithQuizCount: builder.query({
+            query: () => ({
+                url: '/subjects',
+                method: 'GET',
+            }),
+        }),
+
+         //get quizes by category
+        getQuizeByCategory: builder.query({
+            query: (category) => ({
+                url: `/publish-quize?category=${category}`,
+                method: 'GET',
+            }),
+        }),
     })
 })
 
@@ -81,5 +96,7 @@ export const {
     useGetRecentAttemptedQuizzesQuery,
     useTakeQuizMutation,
     useGetPublishedQuizzesQuery,
-    useGetUserSubmissionsQuery
+    useGetUserSubmissionsQuery,
+    useGetSujectsWithQuizCountQuery,
+    useGetQuizeByCategoryQuery
 } = authApi
